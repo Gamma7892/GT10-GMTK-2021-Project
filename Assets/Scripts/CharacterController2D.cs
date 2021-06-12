@@ -18,7 +18,6 @@ public class CharacterController2D : MonoBehaviour
     void Awake()
     {
         rigidBody = GetComponent<Rigidbody2D>();
-        Debug.Log("rigid body found: " + rigidBody);
     }
 
     // Update is called once per frame
