@@ -14,6 +14,7 @@ public class CharacterController2D : MonoBehaviour
 
     private Rigidbody2D rigidBody;
     private Vector3 moveDir;
+    public Vector3 lastMoveDir;
 
     void Awake()
     {
@@ -45,6 +46,10 @@ public class CharacterController2D : MonoBehaviour
         }
 
         moveDir = new Vector3(moveX, moveY).normalized;
+        Vector3 zeroVector = new Vector3(0, 0, 0);
+        if (moveDir != zeroVector ) {
+            lastMoveDir = moveDir;
+        }
     }
 
     void FixedUpdate()
