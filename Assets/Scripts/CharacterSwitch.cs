@@ -12,6 +12,8 @@ public class CharacterSwitch : MonoBehaviour
     public GameObject pointyObj;
     CharacterController2D Roundy;
     CharacterController2D Pointy;
+    //public PlayerFollow Roundystracker;
+    //public PlayerFollow Pointystracker;
     public CameraFollow Camera;
 
     public enum ActiveChar { roundy, pointy }
@@ -21,6 +23,7 @@ public class CharacterSwitch : MonoBehaviour
     {
         Roundy = roundyObj.GetComponent<CharacterController2D>();
         Pointy = pointyObj.GetComponent<CharacterController2D>();
+
     }
 
     // Update is called once per frame
@@ -33,12 +36,16 @@ public class CharacterSwitch : MonoBehaviour
                 case ActiveChar.roundy:
                     Roundy.enabled = false;
                     Pointy.enabled = true;
+                    //Roundystracker.enabled = true;
+                    //Pointystracker.enabled = false;
                     Camera.followedPlayer = pointyObj.transform;
                     currentCharacter = ActiveChar.pointy;
                     break;
                 case ActiveChar.pointy:
                     Pointy.enabled = false;
                     Roundy.enabled = true;
+                    //Pointystracker.enabled = true;
+                    //Roundystracker.enabled = false;
                     Camera.followedPlayer = roundyObj.transform;
                     currentCharacter = ActiveChar.roundy;
                     break;
