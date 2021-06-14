@@ -6,6 +6,9 @@ public class MapGeneration : MonoBehaviour
 {
     private float placeChance = 0.6f;
 
+    public RoomPrefab[] AllRooms;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -18,6 +21,8 @@ public class MapGeneration : MonoBehaviour
         Debug.Log(map.ToString());
         Debug.Log("Seed: " + Random.seed);
 
+        map.PlacePrefabs(AllRooms);
+
     }
 
     // Update is called once per frame
@@ -26,18 +31,23 @@ public class MapGeneration : MonoBehaviour
     
 }
 
-class Map
+[System.Serializable]
+public class Directions
+{
+    public enum RelativeDirection
+    {
+        Up,
+        Down,
+        Left,
+        Right
+    }
+}
+
+class Map : Directions
 {
     Room[,] map;
     int lenY, lenX;
     int startY, startX, endY, endX;
-    //enum RelativeDirection: var 
-    //{ 
-    //    Up = (-1, 0), 
-    //    Down = (1, 0), 
-    //    Left = (0, -1), 
-    //    Right = (0, 1)
-    //}
 
     public Map(int y, int x, float roomPlaceChance)
     {
@@ -106,29 +116,32 @@ class Map
                 {
                     if (map[i + 1, j] != null)
                     {
-                        map[i, j].AdjoiningRooms.Add(map[i + 1, j]);
-                        map[i + 1, j].AdjoiningRooms.Add(map[i, j]);
+                        map[i, j].AdjoiningRooms.Add(RelativeDirection.Down);
+                        map[i + 1, j].AdjoiningRooms.Add(RelativeDirection.Up);
                     }
                     if (map[i, j + 1] != null)
                     {
-                        map[i, j].AdjoiningRooms.Add(map[i, j + 1]);
-                        map[i, j + 1].AdjoiningRooms.Add(map[i, j]);
+                        map[i, j].AdjoiningRooms.Add(RelativeDirection.Right);
+                        map[i, j + 1].AdjoiningRooms.Add(RelativeDirection.Left);
                     }
                 }
             }
         }
         //handle linking rooms on the bottom row
-        for (int i = 0; i < lenX-1; ++i)
+        for (int j = 0; j < lenX-1; ++j)
         {
-            if(map[lenY-1, i] != null && map[lenY - 1, i+1] != null)
+            if (map[lenY-1, j] != null)
             {
-                map[lenY - 1, i].AdjoiningRooms.Add(map[lenY - 1, i + 1]);
-                map[lenY - 1, i + 1].AdjoiningRooms.Add(map[lenY - 1, i]);
+                if (map[lenY - 1, j + 1] != null)
+                {
+                    map[lenY - 1, j].AdjoiningRooms.Add(RelativeDirection.Right);
+                    map[lenY - 1, j + 1].AdjoiningRooms.Add(RelativeDirection.Left);
+                }
             }
         } 
     }
 
-    void PlacePrefabs()
+    public void PlacePrefabs(RoomPrefab[] AllRooms)
     {
         
         
@@ -139,12 +152,11 @@ class Map
                 Room thisRoom = map[i, j];
                 if (thisRoom != null)
                 {
-                    //List<relativeDirection> exits = new List<relativeDirection>();
-                    //foreach (Room r in thisRoom.AdjoiningRooms)
-                    //{
-                    //    (int dy, int dx) relativeDir = (r.y - thisRoom.y, r.x - thisRoom.x); //now we know the relative direction to the adjoined room.
-                        
-                    //}
+                    
+                    //TODO rewrite picking and assigning room prefabs to rooms
+
+                    // now that we know what it is, we can instantiate it.
+
                 }
             }
         }
@@ -173,18 +185,25 @@ class Map
     }
 }
 
-class Room
+[System.Serializable]
+public class RoomPrefab : Directions
+{
+    public RelativeDirection[] exits;
+    public GameObject Prefab;
+}
+
+class Room : Directions
 {
     //NOTE arrays throughout work in reverse what you're used to in an ordered pair. it's (y,x) NOT the euler (x,y). this is important if you want to write out a map to check your logic.
     public int y, x;
-    public List<Room> AdjoiningRooms;
+    public List<RelativeDirection> AdjoiningRooms;
     public GameObject thisRoom;
     public enum RoomType { start, end, normal }
     public RoomType roomType;
 
     public Room(int y, int x)
     {
-        AdjoiningRooms = new List<Room>();
+        AdjoiningRooms = new List<RelativeDirection>();
         roomType = RoomType.normal;
         this.y = y;
         this.x = x;
